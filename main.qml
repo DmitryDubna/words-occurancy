@@ -8,7 +8,9 @@ Window {
 
     readonly property int pageWidth: 1920
     readonly property int pageHeight: 1080
-    readonly property int wordCount: 5
+    readonly property int defaultAxisYMin: 0
+    readonly property int defaultAxisYMax: 1
+    readonly property int maxWordCount: 5
 
     visible: true
     width: pageWidth
@@ -29,8 +31,8 @@ Window {
             }
             axisY: ValueAxis {
                 id: countsAxis
-                min: 0
-                max: 1
+                min: defaultAxisYMin
+                max: defaultAxisYMax
             }
 
             BarSet {
@@ -47,24 +49,20 @@ Window {
 
         let words = []
         let counts = []
-        let maxCount = 0
 
         items
             .sort((a, b) => b.count - a.count)
-            .slice(0, root.wordCount)
+            .slice(0, root.maxWordCount)
             .sort((a, b) => a.word.localeCompare(b.word))
             .forEach(item => {
                          words.push(item.word)
                          counts.push(item.count)
-
-                         if (maxCount < item.count)
-                            maxCount = item.count
                      });
 
         wordsAxis.categories = words
         yValues.values = counts
 
-        countsAxis.max = maxCount
+        countsAxis.max = Math.max(...counts)
     }
 
     // FIXME: убрать тестовое заполнение
