@@ -16,6 +16,7 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Core Quick REQUIRED)
 
 set(PROJECT_SOURCES
     main.cpp
+    occurancy_item.h
     qml.qrc
 )
 
