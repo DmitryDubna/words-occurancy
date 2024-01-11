@@ -3,16 +3,20 @@
 #include <QObject>
 #include <qqml.h>
 
+
 /// Элемент поиска, содержащий найденное слово и число его вхождений.
-class OccurancyItem final : public QObject
+class OccurancyItem : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString word READ word)
-    Q_PROPERTY(std::size_t count READ count)
+    Q_PROPERTY(QString word MEMBER m_word)
+    Q_PROPERTY(std::size_t count MEMBER m_count)
     QML_ELEMENT
 public:
-    explicit OccurancyItem(QString word, const std::size_t count = 0)
-        : m_word(std::move(word))
+    explicit OccurancyItem(QString word = {},
+                           const std::size_t count = 0,
+                           QObject* parent = nullptr)
+        : QObject(parent)
+        , m_word(std::move(word))
         , m_count(count)
     { }
 

@@ -1,5 +1,8 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
+
+#include "project_controller.h"
 
 
 int main(int argc, char *argv[])
@@ -9,13 +12,23 @@ int main(int argc, char *argv[])
 #endif
     QApplication app(argc, argv);
 
+    // движок QML
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
+
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
+                     &app, [url](QObject* obj, const QUrl& objUrl)
+    {
+        if (!obj && (url == objUrl))
             QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
+    },
+    Qt::QueuedConnection);
+
+    // проброс сущностей из C++ в QML
+    ProjectController projectController;
+    engine.rootContext()->setContextProperty("ProjectController", &projectController);
+
+    // загрузка главного окна приложения
     engine.load(url);
 
     return app.exec();

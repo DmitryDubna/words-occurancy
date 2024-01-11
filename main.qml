@@ -1,7 +1,9 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+import QtQml 2.15
 import QtCharts 2.15
+import OccurancyItem 1.0
 
 Window {
     id: root
@@ -16,33 +18,92 @@ Window {
     width: pageWidth
     height: pageHeight
 
-    ChartView {
-        id: chartView
+    Item {
+        id: itemContent
+
         anchors.fill: parent
-        theme: ChartView.ChartThemeBrownSand
-        legend.alignment: Qt.AlignBottom
-        antialiasing: true
 
-        BarSeries {
-            id: series
-            barWidth: 1
-            axisX: BarCategoryAxis {
-                id: wordsAxis
+        ChartView {
+            id: chartView
+
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+                bottom: itemControls.top
             }
-            axisY: ValueAxis {
-                id: countsAxis
-                min: defaultAxisYMin
-                max: defaultAxisYMax
+            theme: ChartView.ChartThemeBrownSand
+            legend.alignment: Qt.AlignBottom
+            antialiasing: true
+
+            BarSeries {
+                id: series
+
+                barWidth: 1
+                axisX: BarCategoryAxis {
+                    id: wordsAxis
+                }
+                axisY: ValueAxis {
+                    id: countsAxis
+
+                    min: defaultAxisYMin
+                    max: defaultAxisYMax
+                }
+
+                BarSet {
+                    id: yValues
+                }
+            }
+        }
+
+        Item {
+            id: itemControls
+
+            height: 100
+            anchors {
+                bottom: itemContent.bottom
+                left: itemContent.left
+                right: itemContent.right
             }
 
-            BarSet {
-                id: yValues
+            Button {
+                id: buttonRun
+
+                text: qsTr("Старт")
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                    bottom: parent.bottom
+                    margins: 10
+                }
+
+                onClicked: ProjectController.runParsingTask("path_to_file");
+            }
+
+            ProgressBar {
+                id: progressBar
+
+                from: 0
+                to: 100
+                anchors {
+                    left: buttonRun.right
+                    right: parent.right
+                    top: buttonRun.top
+                    margins: 10
+                }
+
+
             }
         }
     }
 
+    function initConnections()
+    {
+        ProjectController.progressChanged.connect(updateProgress)
+    }
+
     // объекты { "word", "count" }
-    function update(items)
+    function setItems(items)
     {
         if (!items || !items.length)
             return
@@ -51,13 +112,13 @@ Window {
         let counts = []
 
         items
-            .sort((a, b) => b.count - a.count)
-            .slice(0, root.maxWordCount)
-            .sort((a, b) => a.word.localeCompare(b.word))
-            .forEach(item => {
-                         words.push(item.word)
-                         counts.push(item.count)
-                     });
+        .sort((a, b) => b.count - a.count)
+        .slice(0, root.maxWordCount)
+        .sort((a, b) => a.word.localeCompare(b.word))
+        .forEach(item => {
+                     words.push(item.word)
+                     counts.push(item.count)
+                 });
 
         wordsAxis.categories = words
         yValues.values = counts
@@ -65,16 +126,23 @@ Window {
         countsAxis.max = Math.max(...counts)
     }
 
-    // FIXME: убрать тестовое заполнение
-    Component.onCompleted: {
-        const items = [
-            { "word" : "авокадо", "count" : 20 },
-            { "word" : "брусника", "count" : 11 },
-            { "word" : "виноград", "count" : 21 },
-            { "word" : "дыня", "count" : 13 },
-            { "word" : "земляника", "count" : 20 },
-            { "word" : "калина", "count" : 15 },
-        ]
-        root.update(items)
+    function updateProgress(value)
+    {
+        progressBar.value = value
     }
+
+    function test() {
+        const items = [
+                        { "word" : "авокадо", "count" : 20 },
+                        { "word" : "брусника", "count" : 11 },
+                        { "word" : "виноград", "count" : 21 },
+                        { "word" : "дыня", "count" : 13 },
+                        { "word" : "земляника", "count" : 20 },
+                        { "word" : "калина", "count" : 15 },
+                    ]
+        root.setItems(items)
+    }
+
+    // FIXME: убрать тестовое заполнение
+    Component.onCompleted: root.initConnections()
 }
