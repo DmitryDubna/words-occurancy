@@ -77,7 +77,7 @@ Window {
                     margins: 10
                 }
 
-                onClicked: ProjectController.runParsingTask("path_to_file");
+                onClicked: ProjectController.runParsingTask("/home/dmitry/work/CodeStyle/codestyle/README.md");
             }
 
             ProgressBar {
@@ -99,7 +99,8 @@ Window {
 
     function initConnections()
     {
-        ProjectController.progressChanged.connect(updateProgress)
+        ProjectController.progressRangeChanged.connect(updateProgressRange)
+        ProjectController.progressValueChanged.connect(updateProgressValue)
     }
 
     // объекты { "word", "count" }
@@ -126,11 +127,18 @@ Window {
         countsAxis.max = Math.max(...counts)
     }
 
-    function updateProgress(value)
+    function updateProgressRange(min, max)
+    {
+        progressBar.from = min
+        progressBar.to = max
+    }
+
+    function updateProgressValue(value)
     {
         progressBar.value = value
     }
 
+    // FIXME: убрать после отладки
     function test() {
         const items = [
                         { "word" : "авокадо", "count" : 20 },
@@ -143,6 +151,5 @@ Window {
         root.setItems(items)
     }
 
-    // FIXME: убрать тестовое заполнение
     Component.onCompleted: root.initConnections()
 }

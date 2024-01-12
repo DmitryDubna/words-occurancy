@@ -18,6 +18,7 @@ set(PROJECT_SOURCES
     main.cpp
     occurancy_item.h
     project_controller.h project_controller.cpp
+    utils.h
     qml.qrc
 )
 
