@@ -30,7 +30,7 @@ QList<OccurancyItem> OccurancyItemContainer::toSortedList(Qt::SortOrder order,
     std::transform(m_items.begin(), m_items.end(), std::back_inserter(ret), convert);
     std::sort(ret.begin(), ret.end(), std::move(compare));
 
-    if (limit.has_value())
+    if (limit.has_value() && (limit.value() < m_items.size()))
     {
         ret.erase(std::next(ret.begin(), limit.value()), ret.end());
     }

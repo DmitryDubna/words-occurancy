@@ -24,13 +24,13 @@ private:
 signals:
     void progressRangeChanged(int min, int max);
     void progressValueChanged(int value);
-    void parsingComplete(QList<OccurancyItem> items);
+    void itemsExtracted(QList<OccurancyItem> items);
 
 private:
     void initConnections();
 
 private slots:
-    void onParsingFinished();
+    void onResultReady(int resultIndex);
 
 private:
     QFutureWatcher<QList<OccurancyItem>> m_watcher;

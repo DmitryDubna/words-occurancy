@@ -63,15 +63,11 @@ void parseFile(QPromise<QList<OccurancyItem>>& promise,
 
         // обновляем позицию ProgressBar'а
         promise.setProgressValue(bytesRead);
-    }
 
-    // забираем отсортированный список результатов
-    auto sortedList = container.toSortedList(Qt::DescendingOrder, wordsLimit);
-    for (const auto& item : sortedList)
-    {
-        qDebug() << item.word() << ":" << item.count();
+        // забираем отсортированный список результатов
+        auto sortedList = container.toSortedList(Qt::DescendingOrder, wordsLimit);
+        promise.addResult(std::move(sortedList));
     }
-    promise.addResult(std::move(sortedList));
 }
 
 } // namespace
@@ -98,12 +94,11 @@ void ProjectController::initConnections()
             this, &ProjectController::progressRangeChanged);
     connect(&m_watcher, &QFutureWatcherBase::progressValueChanged,
             this, &ProjectController::progressValueChanged);
-    connect(&m_watcher, &QFutureWatcherBase::finished,
-            this, &ProjectController::onParsingFinished);
+    connect(&m_watcher, &QFutureWatcherBase::resultReadyAt,
+            this, &ProjectController::onResultReady);
 }
 
-void ProjectController::onParsingFinished()
+void ProjectController::onResultReady(int resultIndex)
 {
-    emit parsingComplete(m_watcher.result());
+    emit itemsExtracted(m_watcher.resultAt(resultIndex));
 }
-

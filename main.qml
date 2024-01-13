@@ -91,20 +91,19 @@ Window {
                     top: buttonRun.top
                     margins: 10
                 }
-
-
             }
         }
     }
 
+    // инициализирует обработчики сигналов
     function initConnections()
     {
         ProjectController.progressRangeChanged.connect(updateProgressRange)
         ProjectController.progressValueChanged.connect(updateProgressValue)
-        ProjectController.parsingComplete.connect(setItems)
+        ProjectController.itemsExtracted.connect(setItems)
     }
 
-    // объекты { "word", "count" }
+    // задает список объектов OccurancyItem
     function setItems(items)
     {
         if (!items || !items.length)
@@ -128,12 +127,14 @@ Window {
         countsAxis.max = Math.max(...counts)
     }
 
+    // обновляет диапазон значений ProgressBar'а
     function updateProgressRange(min, max)
     {
         progressBar.from = min
         progressBar.to = max
     }
 
+    // обновляет текущее значение ProgressBar'а
     function updateProgressValue(value)
     {
         progressBar.value = value
