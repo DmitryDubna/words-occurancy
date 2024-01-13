@@ -1,8 +1,9 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
-import QtQml 2.15
-import QtCharts 2.15
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQml
+import QtCharts
+import QtQuick.Layouts
 import OccurancyItem 1.0
 
 Window {
@@ -13,6 +14,7 @@ Window {
     readonly property int defaultAxisYMin: 0
     readonly property int defaultAxisYMax: 1
     readonly property int maxWordCount: 15
+    readonly property int margin: 10
 
     visible: true
     width: pageWidth
@@ -32,9 +34,9 @@ Window {
                 right: parent.right
                 bottom: itemControls.top
             }
-            theme: ChartView.ChartThemeBrownSand
-            legend.alignment: Qt.AlignBottom
+            theme: ChartView.ChartThemeBlueIcy
             antialiasing: true
+            legend.visible: false
 
             BarSeries {
                 id: series
@@ -59,37 +61,126 @@ Window {
         Item {
             id: itemControls
 
-            height: 100
             anchors {
                 bottom: itemContent.bottom
                 left: itemContent.left
                 right: itemContent.right
+                leftMargin: root.margin
+                rightMargin: root.margin
+                topMargin: root.margin
+                bottomMargin: root.margin
             }
 
-            Button {
-                id: buttonRun
+            height: rowProgress.height
+                    + rowFilePath.height
+                    + rowControlButtons.height
+                    + 2 * columnControls.spacing
 
-                text: qsTr("Старт")
-                anchors {
-                    left: parent.left
-                    top: parent.top
-                    bottom: parent.bottom
-                    margins: 10
+            ColumnLayout{
+                id: columnControls
+
+                anchors.fill: parent
+
+                // прогрессбар + лейбл загрузки
+                RowLayout {
+                    id: rowProgress
+                    layoutDirection: Qt.LeftToRight
+                    spacing: 10
+
+                    ProgressBar {
+                        id: progressBar
+
+                        Layout.fillWidth: true
+                        from: 0
+                        to: 100
+                    }
+
+                    Rectangle {
+                        border.color: "gray"
+                        radius: 4
+                        height: progressBar.height
+                        width: textProcessedBytes.width
+
+                        Text {
+                            id: textProcessedBytes
+
+                            anchors.centerIn: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            width: 400;
+                        }
+                    }
+
+                    function updateProgressValue(value)
+                    {
+                        progressBar.value = value
+                        textProcessedBytes.text = `Обработано: ${value} / ${progressBar.to} байт`
+                    }
                 }
 
-                onClicked: ProjectController.runParsingTask("/home/dmitry/work/CodeStyle/codestyle/README.md", root.maxWordCount);
-            }
+                // выбор пути к файлу
+                RowLayout {
+                    id: rowFilePath
 
-            ProgressBar {
-                id: progressBar
+                    Rectangle {
+                        border.color: "gray"
+                        radius: 4
+                        height: buttonChooseFilePath.height
+                        Layout.fillWidth: true
 
-                from: 0
-                to: 100
-                anchors {
-                    left: buttonRun.right
-                    right: parent.right
-                    top: buttonRun.top
-                    margins: 10
+                        TextEdit {
+                            id: editFilePath
+                            anchors {
+                                fill: parent
+                                leftMargin: root.margin
+                                rightMargin: root.margin
+                            }
+                            verticalAlignment: TextEdit.AlignVCenter
+                        }
+                    }
+
+                    Button {
+                        id: buttonChooseFilePath
+
+                        text: "..."
+//                        onClicked:
+                    }
+                }
+
+                // кнопки управления процессом
+                RowLayout {
+                    id: rowControlButtons
+
+                    // кнопка "Начать"
+                    Button {
+                        id: buttonStart
+
+                        text: qsTr("Начать")
+                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                    }
+
+                    // кнопка "Приостановить"
+                    Button {
+                        id: buttonSuspend
+
+                        text: qsTr("Приостановить")
+//                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                    }
+
+                    // кнопка "Продолжить"
+                    Button {
+                        id: buttonResume
+
+                        text: qsTr("Продолжить")
+//                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                    }
+
+                    // кнопка "Завершить"
+                    Button {
+                        id: buttonStop
+
+                        text: qsTr("Завершить")
+                        //                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                    }
                 }
             }
         }
@@ -137,21 +228,11 @@ Window {
     // обновляет текущее значение ProgressBar'а
     function updateProgressValue(value)
     {
-        progressBar.value = value
+        rowProgress.updateProgressValue(value)
     }
 
-    // FIXME: убрать после отладки
-//    function test() {
-//        const items = [
-//                        { "word" : "авокадо", "count" : 20 },
-//                        { "word" : "брусника", "count" : 11 },
-//                        { "word" : "виноград", "count" : 21 },
-//                        { "word" : "дыня", "count" : 13 },
-//                        { "word" : "земляника", "count" : 20 },
-//                        { "word" : "калина", "count" : 15 },
-//                    ]
-//        root.setItems(items)
-//    }
-
-    Component.onCompleted: root.initConnections()
+    Component.onCompleted: {
+        root.initConnections()
+        rowProgress.updateProgressValue(0)
+    }
 }
