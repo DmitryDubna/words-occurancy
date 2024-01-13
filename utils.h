@@ -4,22 +4,24 @@
 #include <string>
 #include <vector>
 
-inline std::vector<std::string> extractWords(const std::string str, const std::regex regex = std::regex("[\\s,]+"))
+/// Парсит строку, выделяя из нее слова на базе регулярного выражения.
+/// Возвращает коллекцию выделенных слов.
+inline std::vector<std::string> extractWords(const std::string line, const std::regex regex)
 {
     using namespace std;
 
     vector<string> result;
 
-    sregex_token_iterator it( str.begin(), str.end(), regex, -1 );
-    const sregex_token_iterator reg_end;
+    sregex_token_iterator it(line.begin(), line.end(), regex, -1);
+    const sregex_token_iterator itEnd;
 
-    for ( ; it != reg_end; ++it )
+    for (; it != itEnd; ++it)
     {
-        if (!it->str().empty()) //token could be empty:check
-            result.emplace_back( it->str() );
+        if (it->str().empty())
+            continue;
+
+        result.emplace_back(it->str());
     }
 
     return result;
 }
-
-
