@@ -13,6 +13,7 @@
 // FIXME: убрать после отладки
 #include <QDebug>
 
+
 namespace
 {
 
@@ -32,7 +33,7 @@ void parseLine(const std::string& line, OccurancyItemContainer& container)
 
 /// Считывает файл построчно, выделяет из строк слова.
 /// Извещает вызывающую сторону о ходе прогресса.
-void parseFile(QPromise<int>& promise,
+void parseFile(QPromise<QList<OccurancyItem>>& promise,
                const std::string& filePath,
                const std::optional<std::size_t> wordsLimit = std::nullopt)
 {
@@ -65,11 +66,12 @@ void parseFile(QPromise<int>& promise,
     }
 
     // забираем отсортированный список результатов
-    const auto sortedList = container.toSortedList(Qt::DescendingOrder, wordsLimit);
+    auto sortedList = container.toSortedList(Qt::DescendingOrder, wordsLimit);
     for (const auto& item : sortedList)
     {
         qDebug() << item.word() << ":" << item.count();
     }
+    promise.addResult(std::move(sortedList));
 }
 
 } // namespace
@@ -96,5 +98,12 @@ void ProjectController::initConnections()
             this, &ProjectController::progressRangeChanged);
     connect(&m_watcher, &QFutureWatcherBase::progressValueChanged,
             this, &ProjectController::progressValueChanged);
+    connect(&m_watcher, &QFutureWatcherBase::finished,
+            this, &ProjectController::onParsingFinished);
+}
+
+void ProjectController::onParsingFinished()
+{
+    emit parsingComplete(m_watcher.result());
 }
 

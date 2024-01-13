@@ -2,6 +2,9 @@
 
 #include <QObject>
 #include <QFutureWatcher>
+#include <QVariantList>
+
+#include "occurancy_item.h"
 
 
 /// Контроллер проекта - объект, осуществляющий взаимодействие backend (C++) c frontend'ом (QML).
@@ -21,10 +24,14 @@ private:
 signals:
     void progressRangeChanged(int min, int max);
     void progressValueChanged(int value);
+    void parsingComplete(QList<OccurancyItem> items);
 
 private:
     void initConnections();
 
+private slots:
+    void onParsingFinished();
+
 private:
-    QFutureWatcher<int> m_watcher;
+    QFutureWatcher<QList<OccurancyItem>> m_watcher;
 };

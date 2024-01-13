@@ -6,17 +6,15 @@
 
 
 /// Элемент поиска, содержащий найденное слово и число его вхождений.
-class OccurancyItem /*: public QObject*/
+class OccurancyItem
 {
-//    Q_OBJECT
-//    Q_PROPERTY(QString word MEMBER m_word)
-//    Q_PROPERTY(std::size_t count MEMBER m_count)
+    Q_GADGET
+    Q_PROPERTY(QString word MEMBER m_word)
+    Q_PROPERTY(std::size_t count MEMBER m_count)
 //    QML_ELEMENT
 public:
     explicit OccurancyItem(QString word = {},
-                           const std::size_t count = DEFAULT_COUNT/*,
-                           QObject* parent = nullptr*/)
-//        : QObject(parent)
+                           const std::size_t count = DEFAULT_COUNT)
         : m_word(std::move(word))
         , m_count(count)
     { }
@@ -34,3 +32,5 @@ private:
     QString m_word;
     std::size_t m_count;
 };
+
+Q_DECLARE_METATYPE(OccurancyItem)

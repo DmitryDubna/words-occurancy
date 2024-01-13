@@ -101,6 +101,7 @@ Window {
     {
         ProjectController.progressRangeChanged.connect(updateProgressRange)
         ProjectController.progressValueChanged.connect(updateProgressValue)
+        ProjectController.parsingComplete.connect(setItems)
     }
 
     // объекты { "word", "count" }
@@ -113,13 +114,13 @@ Window {
         let counts = []
 
         items
-        .sort((a, b) => b.count - a.count)
-        .slice(0, root.maxWordCount)
-        .sort((a, b) => a.word.localeCompare(b.word))
-        .forEach(item => {
-                     words.push(item.word)
-                     counts.push(item.count)
-                 });
+            .sort((a, b) => b.count - a.count)
+            .slice(0, root.maxWordCount)
+            .sort((a, b) => a.word.localeCompare(b.word))
+            .forEach(item => {
+                         words.push(item.word)
+                         counts.push(item.count)
+                     });
 
         wordsAxis.categories = words
         yValues.values = counts
@@ -139,17 +140,17 @@ Window {
     }
 
     // FIXME: убрать после отладки
-    function test() {
-        const items = [
-                        { "word" : "авокадо", "count" : 20 },
-                        { "word" : "брусника", "count" : 11 },
-                        { "word" : "виноград", "count" : 21 },
-                        { "word" : "дыня", "count" : 13 },
-                        { "word" : "земляника", "count" : 20 },
-                        { "word" : "калина", "count" : 15 },
-                    ]
-        root.setItems(items)
-    }
+//    function test() {
+//        const items = [
+//                        { "word" : "авокадо", "count" : 20 },
+//                        { "word" : "брусника", "count" : 11 },
+//                        { "word" : "виноград", "count" : 21 },
+//                        { "word" : "дыня", "count" : 13 },
+//                        { "word" : "земляника", "count" : 20 },
+//                        { "word" : "калина", "count" : 15 },
+//                    ]
+//        root.setItems(items)
+//    }
 
     Component.onCompleted: root.initConnections()
 }
