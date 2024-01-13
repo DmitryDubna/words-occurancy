@@ -16,7 +16,7 @@ public:
 
 public:
     /// Запускает в отдельном потоке задачу по выделению слов из текстового файла.
-    Q_INVOKABLE void runParsingTask(const QString& filePath, int wordsLimit = NO_LIMIT);
+    Q_INVOKABLE void runParsingTask(const QUrl& filePath, int wordsLimit = NO_LIMIT);
 
 private:
     static const int NO_LIMIT{ -1 };

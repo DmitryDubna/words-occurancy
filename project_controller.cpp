@@ -79,11 +79,11 @@ ProjectController::ProjectController(QObject* parent)
     initConnections();
 }
 
-void ProjectController::runParsingTask(const QString& filePath, const int wordsLimit)
+void ProjectController::runParsingTask(const QUrl& filePath, const int wordsLimit)
 {
     m_watcher.setFuture(
         QtConcurrent::run(parseFile,
-                          filePath.toStdString(),
+                          filePath.toLocalFile().toStdString(),
                           (NO_LIMIT == wordsLimit) ? std::nullopt
                                                    : std::make_optional(wordsLimit)));
 }

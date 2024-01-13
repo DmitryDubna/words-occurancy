@@ -4,6 +4,8 @@ import QtQuick.Controls
 import QtQml
 import QtCharts
 import QtQuick.Layouts
+import QtQuick.Dialogs
+import Qt.labs.platform
 import OccurancyItem 1.0
 
 Window {
@@ -142,7 +144,15 @@ Window {
                         id: buttonChooseFilePath
 
                         text: "..."
-//                        onClicked:
+                        onClicked: fileDialog.open()
+                    }
+
+                    FileDialog {
+                        id: fileDialog
+
+                        nameFilters: ["Text files (*.txt)"]
+                        folder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+                        onAccepted: editFilePath.text = file
                     }
                 }
 
@@ -155,7 +165,8 @@ Window {
                         id: buttonStart
 
                         text: qsTr("Начать")
-                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                        onClicked: rowControlButtons.parseFile(editFilePath.text, root.maxWordCount)
+
                     }
 
                     // кнопка "Приостановить"
@@ -180,6 +191,11 @@ Window {
 
                         text: qsTr("Завершить")
                         //                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                    }
+
+                    function parseFile(filePath, maxWordCount)
+                    {
+                        ProjectController.runParsingTask(filePath, maxWordCount);
                     }
                 }
             }
