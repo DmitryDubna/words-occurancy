@@ -12,7 +12,7 @@ Window {
     readonly property int pageHeight: 1080
     readonly property int defaultAxisYMin: 0
     readonly property int defaultAxisYMax: 1
-    readonly property int maxWordCount: 5
+    readonly property int maxWordCount: 15
 
     visible: true
     width: pageWidth
@@ -77,7 +77,7 @@ Window {
                     margins: 10
                 }
 
-                onClicked: ProjectController.runParsingTask("/home/dmitry/work/CodeStyle/codestyle/README.md");
+                onClicked: ProjectController.runParsingTask("/home/dmitry/work/CodeStyle/codestyle/README.md", root.maxWordCount);
             }
 
             ProgressBar {

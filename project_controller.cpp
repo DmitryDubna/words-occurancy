@@ -26,14 +26,15 @@ void parseLine(const std::string& line, OccurancyItemContainer& container)
     const vector<string> words = extractWords(line, regex(SPLIT_WORD_REGEX));
     for (const auto word : words)
     {
-//        qDebug() << QString::fromStdString(word);
         container.append(QString::fromStdString(word));
     }
 }
 
 /// Считывает файл построчно, выделяет из строк слова.
 /// Извещает вызывающую сторону о ходе прогресса.
-void parseFile(QPromise<int>& promise, const std::string& filePath)
+void parseFile(QPromise<int>& promise,
+               const std::string& filePath,
+               const std::optional<std::size_t> wordsLimit = std::nullopt)
 {
     std::ifstream file(filePath);
     std::string line;
@@ -64,7 +65,7 @@ void parseFile(QPromise<int>& promise, const std::string& filePath)
     }
 
     // забираем отсортированный список результатов
-    const auto sortedList = container.toSortedList(Qt::DescendingOrder, 1000);
+    const auto sortedList = container.toSortedList(Qt::DescendingOrder, wordsLimit);
     for (const auto& item : sortedList)
     {
         qDebug() << item.word() << ":" << item.count();
@@ -80,9 +81,13 @@ ProjectController::ProjectController(QObject* parent)
     initConnections();
 }
 
-void ProjectController::runParsingTask(const QString& filePath)
+void ProjectController::runParsingTask(const QString& filePath, const int wordsLimit)
 {
-    m_watcher.setFuture(QtConcurrent::run(parseFile, filePath.toStdString()));
+    m_watcher.setFuture(
+        QtConcurrent::run(parseFile,
+                          filePath.toStdString(),
+                          (NO_LIMIT == wordsLimit) ? std::nullopt
+                                                   : std::make_optional(wordsLimit)));
 }
 
 void ProjectController::initConnections()

@@ -13,10 +13,7 @@ public:
 public:
     void append(const QString& word);
     QList<OccurancyItem> toSortedList(Qt::SortOrder order = Qt::DescendingOrder,
-                                      std::size_t limit = DEFAULT_LIMIT);
-
-private:
-    static const std::size_t DEFAULT_LIMIT{ 100 };
+                                      std::optional<std::size_t> limit = std::nullopt);
 
 private:
     std::unordered_map<QString, OccurancyItem> m_items;
