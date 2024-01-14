@@ -3,7 +3,8 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtCharts
 
-Item {
+
+RowLayout {
     id: root
 
     readonly property int defaultAxisYMin: 0
@@ -11,71 +12,65 @@ Item {
     readonly property int listWidth: 300
     readonly property int margin: 10
 
-    RowLayout {
-        id: rowResultView
+    ChartView {
+        id: chartView
 
-        anchors.fill: parent
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        theme: ChartView.ChartThemeQt
+        antialiasing: true
+        legend.visible: false
 
-        ChartView {
-            id: chartView
+        BarSeries {
+            id: series
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            theme: ChartView.ChartThemeQt
-            antialiasing: true
-            legend.visible: false
+            barWidth: 1
+            axisX: BarCategoryAxis {
+                id: wordsAxis
+            }
+            axisY: ValueAxis {
+                id: countsAxis
 
-            BarSeries {
-                id: series
-
-                barWidth: 1
-                axisX: BarCategoryAxis {
-                    id: wordsAxis
-                }
-                axisY: ValueAxis {
-                    id: countsAxis
-
-                    min: root.defaultAxisYMin
-                    max: root.defaultAxisYMax
-                }
-
-                BarSet {
-                    id: yValues
-                }
+                min: root.defaultAxisYMin
+                max: root.defaultAxisYMax
             }
 
-            // визуализирует список объектов OccurancyItem
-            function displayItems(items)
-            {
-                if (!items || !items.length)
-                    return
-
-                let words = []
-                let counts = []
-
-                items
-                    .sort((a, b) => b.count - a.count)
-                    .slice(0, root.maxWordCount)
-                    .sort((a, b) => a.word.localeCompare(b.word))
-                    .forEach(item => {
-                                 words.push(item.word)
-                                 counts.push(item.count)
-                             });
-
-                wordsAxis.categories = words
-                yValues.values = counts
-
-                countsAxis.max = Math.max(...counts)
+            BarSet {
+                id: yValues
             }
         }
 
-        OccurancyList {
-            id: listItems
+        // визуализирует список объектов OccurancyItem
+        function displayItems(items)
+        {
+            if (!items || !items.length)
+                return
 
-            width: root.listWidth
-            Layout.fillHeight: true
-            Layout.margins: root.margin
+            let words = []
+            let counts = []
+
+            items
+                .sort((a, b) => b.count - a.count)
+                .slice(0, root.maxWordCount)
+                .sort((a, b) => a.word.localeCompare(b.word))
+                .forEach(item => {
+                             words.push(item.word)
+                             counts.push(item.count)
+                         });
+
+            wordsAxis.categories = words
+            yValues.values = counts
+
+            countsAxis.max = Math.max(...counts)
         }
+    }
+
+    OccurancyList {
+        id: listItems
+
+        width: root.listWidth
+        Layout.fillHeight: true
+        Layout.margins: root.margin
     }
 
     function updateHistogram(items)

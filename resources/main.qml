@@ -11,17 +11,17 @@ import Components.Common
 Window {
     id: root
 
-    readonly property int pageWidth: 1920
-    readonly property int pageHeight: 1080
+    readonly property int defaultWidth: 1920
+    readonly property int defaultHeight: 1080
     readonly property int maxWordCount: 15
     readonly property int margin: 10
     readonly property var selectedFile: panelFileChoose.filePath
 
     property int userAction: UserActionType.Canceled
 
+    width: defaultWidth
+    height: defaultHeight
     visible: true
-    width: pageWidth
-    height: pageHeight
 
     ColumnLayout {
         id: itemContent

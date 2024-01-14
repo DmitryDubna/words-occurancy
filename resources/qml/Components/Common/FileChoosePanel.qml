@@ -11,6 +11,7 @@ RowLayout {
     property string borderColor: "gray"
     property string filePath: editFilePath.text
     property var filter: ["Text files (*.txt)"]
+    property int horizontalTextPadding: 20
 
     Rectangle {
         border.color: root.borderColor
@@ -29,6 +30,8 @@ RowLayout {
                 rightMargin: root.margin
             }
             verticalAlignment: TextEdit.AlignVCenter
+            leftPadding: root.horizontalTextPadding
+            rightPadding: root.horizontalTextPadding
         }
     }
 
