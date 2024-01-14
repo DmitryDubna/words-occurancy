@@ -53,6 +53,12 @@ void parseFile(QPromise<QList<OccurancyItem>>& promise,
     std::uintmax_t bytesRead{ 0 };
     while (file)
     {
+        // проверить необходимость приостановить,...
+        promise.suspendIfRequested();
+        // ... либо завершить задачу
+        if (promise.isCanceled())
+            break;
+
         // считаываем строку файла...
         std::getline(file, line);
         // ... и парсим
@@ -88,6 +94,21 @@ void ProjectController::runParsingTask(const QUrl& filePath, const int wordsLimi
                                                    : std::make_optional(wordsLimit)));
 }
 
+void ProjectController::suspendParsingTask()
+{
+    m_watcher.suspend();
+}
+
+void ProjectController::resumeParsingTask()
+{
+    m_watcher.resume();
+}
+
+void ProjectController::cancelParsingTask()
+{
+    m_watcher.cancel();
+}
+
 void ProjectController::initConnections()
 {
     connect(&m_watcher, &QFutureWatcherBase::progressRangeChanged,
@@ -96,6 +117,16 @@ void ProjectController::initConnections()
             this, &ProjectController::progressValueChanged);
     connect(&m_watcher, &QFutureWatcherBase::resultReadyAt,
             this, &ProjectController::onResultReady);
+
+    connect(&m_watcher, &QFutureWatcherBase::started,
+            this, [this](){ emit userActionPerformed(UserActionType::Started); });
+    connect(&m_watcher, &QFutureWatcherBase::suspended,
+            this, [this](){ emit userActionPerformed(UserActionType::Suspended); });
+    connect(&m_watcher, &QFutureWatcherBase::resumed,
+            this, [this](){ emit userActionPerformed(UserActionType::Resumed); });
+    connect(&m_watcher, &QFutureWatcherBase::canceled,
+            this, [this](){ emit userActionPerformed(UserActionType::Canceled); });
+
 }
 
 void ProjectController::onResultReady(int resultIndex)

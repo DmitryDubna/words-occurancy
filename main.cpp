@@ -3,6 +3,7 @@
 #include <QQmlContext>
 
 #include "project_controller.h"
+#include "user_action_type.h"
 
 
 int main(int argc, char *argv[])
@@ -27,6 +28,9 @@ int main(int argc, char *argv[])
     // проброс сущностей из C++ в QML
     ProjectController projectController;
     engine.rootContext()->setContextProperty("ProjectController", &projectController);
+
+    // регистрация enum
+    UserActionType::registerEnum("UserActionType");
 
     // загрузка главного окна приложения
     engine.load(url);

@@ -6,7 +6,8 @@ import QtCharts
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import Qt.labs.platform
-import OccurancyItem 1.0
+import OccurancyItem
+import UserActionType
 
 Window {
     id: root
@@ -17,6 +18,8 @@ Window {
     readonly property int defaultAxisYMax: 1
     readonly property int maxWordCount: 15
     readonly property int margin: 10
+
+    property var userAction: UserActionType.Canceled
 
     visible: true
     width: pageWidth
@@ -131,6 +134,9 @@ Window {
 
                         TextEdit {
                             id: editFilePath
+
+                            color: "gray"
+                            enabled: false
                             anchors {
                                 fill: parent
                                 leftMargin: root.margin
@@ -165,8 +171,9 @@ Window {
                         id: buttonStart
 
                         text: qsTr("Начать")
-                        onClicked: rowControlButtons.parseFile(editFilePath.text, root.maxWordCount)
+                        enabled: (root.userAction === UserActionType.Canceled) && (editFilePath.text)
 
+                        onClicked: rowControlButtons.runParsingTask(editFilePath.text, root.maxWordCount)
                     }
 
                     // кнопка "Приостановить"
@@ -174,7 +181,9 @@ Window {
                         id: buttonSuspend
 
                         text: qsTr("Приостановить")
-//                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                        enabled: (root.userAction === UserActionType.Started) || (root.userAction === UserActionType.Resumed)
+
+                        onClicked: rowControlButtons.suspendParsingTask()
                     }
 
                     // кнопка "Продолжить"
@@ -182,7 +191,9 @@ Window {
                         id: buttonResume
 
                         text: qsTr("Продолжить")
-//                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                        enabled: (root.userAction === UserActionType.Suspended)
+
+                        onClicked: rowControlButtons.resumeParsingTask()
                     }
 
                     // кнопка "Завершить"
@@ -190,12 +201,29 @@ Window {
                         id: buttonStop
 
                         text: qsTr("Завершить")
-                        //                        onClicked: ProjectController.runParsingTask("/home/dmitry/work/QtProjects/words-occurancy/pushkin.txt", root.maxWordCount);
+                        enabled: (root.userAction !== UserActionType.Canceled)
+
+                        onClicked: rowControlButtons.cancelParsingTask()
                     }
 
-                    function parseFile(filePath, maxWordCount)
+                    function runParsingTask(filePath, maxWordCount)
                     {
                         ProjectController.runParsingTask(filePath, maxWordCount);
+                    }
+
+                    function suspendParsingTask()
+                    {
+                        ProjectController.suspendParsingTask();
+                    }
+
+                    function resumeParsingTask()
+                    {
+                        ProjectController.resumeParsingTask();
+                    }
+
+                    function cancelParsingTask()
+                    {
+                        ProjectController.cancelParsingTask();
                     }
                 }
             }
@@ -208,6 +236,7 @@ Window {
         ProjectController.progressRangeChanged.connect(updateProgressRange)
         ProjectController.progressValueChanged.connect(updateProgressValue)
         ProjectController.itemsExtracted.connect(setItems)
+        ProjectController.userActionPerformed.connect(setUserAction)
     }
 
     // задает список объектов OccurancyItem
@@ -245,6 +274,12 @@ Window {
     function updateProgressValue(value)
     {
         rowProgress.updateProgressValue(value)
+    }
+
+    // устанавливает текущее действие пользователя
+    function setUserAction(action)
+    {
+        root.userAction = action
     }
 
     Component.onCompleted: {
