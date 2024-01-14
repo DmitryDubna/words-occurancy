@@ -13,10 +13,11 @@ Rectangle {
     property int headerHeight: 40
     property int headerMargin: 10
     property int headerFontSize: 16
+    property string borderColor: "gray"
     property var modelItems: []
 
     radius: 4
-    border.color: "gray"
+    border.color: root.borderColor
 
     function setItems(items)
     {
