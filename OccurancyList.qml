@@ -3,19 +3,13 @@ import QtQuick
 Rectangle {
     id: root
 
-    property int margin: 4
+    property int itemPadding: 4
     property int listItemSpacing: 16
     property var itemDelegate: componentDelegate
     property var modelItems: []
 
     radius: 4
     border.color: "gray"
-    anchors {
-        leftMargin: root.margin
-        rightMargin: root.margin
-        topMargin: root.margin
-        bottomMargin: root.margin
-    }
 
     function setItems(items)
     {
@@ -37,17 +31,6 @@ Rectangle {
         id: listItems
 
         clip: true
-        anchors.fill: root
-//        anchors {
-//            top: root.titleVisible ? lblTitle.bottom : root.top
-//            left: root.left
-//            right: root.right
-//            bottom: root.bottom
-//            leftMargin: root.horizontalContentPadding
-//            rightMargin: root.horizontalContentPadding
-//            topMargin: root.verticalContentPadding
-//            bottomMargin: buttonVisible ? 99 : root.verticalContentPadding
-//        }
         model: root.modelItems
         delegate: root.itemDelegate
         spacing: root.listItemSpacing
@@ -70,10 +53,10 @@ Rectangle {
             anchors {
                 left: parent.left
                 right: parent.right
-                leftMargin: rectDelegate.margin
-                rightMargin: rectDelegate.margin
-                topMargin: rectDelegate.margin
-                bottomMargin: rectDelegate.margin
+                leftMargin: rectDelegate.itemPadding
+                rightMargin: rectDelegate.itemPadding
+                topMargin: rectDelegate.itemPadding
+                bottomMargin: rectDelegate.itemPadding
             }
 //            height: txtDateTime.height + txtMessage.height + 2 * verticalContentPadding
 //            height: 20

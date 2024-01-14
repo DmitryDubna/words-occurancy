@@ -26,65 +26,53 @@ Window {
     width: pageWidth
     height: pageHeight
 
-    Item {
+    ColumnLayout {
         id: itemContent
 
         anchors.fill: parent
 
-        OccurancyList {
-            id: listItems
+        // панель визуального представления результатов
+        RowLayout {
+            id: rowResultView
 
-            width: root.listWidth
-            margin: root.margin
-            anchors {
-                top: parent.top
-                right: parent.right
-                bottom: itemControls.top
-            }
-        }
+            ChartView {
+                id: chartView
 
-        ChartView {
-            id: chartView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                theme: ChartView.ChartThemeQt
+                antialiasing: true
+                legend.visible: false
 
-            anchors {
-                top: parent.top
-                left: parent.left
-                right: listItems.left
-                bottom: itemControls.top
-            }
-            theme: ChartView.ChartThemeQt
-            antialiasing: true
-            legend.visible: false
+                BarSeries {
+                    id: series
 
-            BarSeries {
-                id: series
+                    barWidth: 1
+                    axisX: BarCategoryAxis {
+                        id: wordsAxis
+                    }
+                    axisY: ValueAxis {
+                        id: countsAxis
 
-                barWidth: 1
-                axisX: BarCategoryAxis {
-                    id: wordsAxis
-                }
-                axisY: ValueAxis {
-                    id: countsAxis
+                        min: defaultAxisYMin
+                        max: defaultAxisYMax
+                    }
 
-                    min: defaultAxisYMin
-                    max: defaultAxisYMax
+                    BarSet {
+                        id: yValues
+                    }
                 }
 
-                BarSet {
-                    id: yValues
-                }
-            }
+                // визуализирует список объектов OccurancyItem
+                function displayItems(items)
+                {
+                    if (!items || !items.length)
+                        return
 
-            // визуализирует список объектов OccurancyItem
-            function displayItems(items)
-            {
-                if (!items || !items.length)
-                    return
+                    let words = []
+                    let counts = []
 
-                let words = []
-                let counts = []
-
-                items
+                    items
                     .sort((a, b) => b.count - a.count)
                     .slice(0, root.maxWordCount)
                     .sort((a, b) => a.word.localeCompare(b.word))
@@ -93,184 +81,175 @@ Window {
                                  counts.push(item.count)
                              });
 
-                wordsAxis.categories = words
-                yValues.values = counts
+                    wordsAxis.categories = words
+                    yValues.values = counts
 
-                countsAxis.max = Math.max(...counts)
+                    countsAxis.max = Math.max(...counts)
+                }
+            }
+
+            OccurancyList {
+                id: listItems
+
+                width: root.listWidth
+                Layout.fillHeight: true
+                Layout.margins: root.margin
             }
         }
 
-        Item {
-            id: itemControls
+        // панель органов управления
+        ColumnLayout {
+            id: columnControls
 
-            anchors {
-                bottom: itemContent.bottom
-                left: itemContent.left
-                right: itemContent.right
-                leftMargin: root.margin
-                rightMargin: root.margin
-                topMargin: root.margin
-                bottomMargin: root.margin
+            Layout.margins: root.margin
+
+            // прогрессбар + лейбл загрузки
+            RowLayout {
+                id: rowProgress
+                layoutDirection: Qt.LeftToRight
+                spacing: 10
+
+                ProgressBar {
+                    id: progressBar
+
+                    Layout.fillWidth: true
+                    from: 0
+                    to: 0
+                }
+
+                Rectangle {
+                    border.color: "gray"
+                    radius: 4
+                    height: progressBar.height
+                    width: textProcessedBytes.width
+
+                    Text {
+                        id: textProcessedBytes
+
+                        anchors.centerIn: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        width: 400;
+                    }
+                }
+
+                // обновляет диапазон значений ProgressBar'а
+                function updateProgressRange(min, max)
+                {
+                    progressBar.from = min
+                    progressBar.to = max
+                }
+
+                // обновляет текущее значение ProgressBar'а
+                function updateProgressValue(value)
+                {
+                    progressBar.value = value
+                    textProcessedBytes.text = `Обработано: ${value} / ${progressBar.to} байт`
+                }
             }
 
-            height: rowProgress.height
-                    + rowFilePath.height
-                    + rowControlButtons.height
-                    + 2 * columnControls.spacing
+            // выбор пути к файлу
+            RowLayout {
+                id: rowFilePath
 
-            ColumnLayout{
-                id: columnControls
+                Rectangle {
+                    border.color: "gray"
+                    radius: 4
+                    height: buttonChooseFilePath.height
+                    Layout.fillWidth: true
 
-                anchors.fill: parent
+                    TextEdit {
+                        id: editFilePath
 
-                // прогрессбар + лейбл загрузки
-                RowLayout {
-                    id: rowProgress
-                    layoutDirection: Qt.LeftToRight
-                    spacing: 10
-
-                    ProgressBar {
-                        id: progressBar
-
-                        Layout.fillWidth: true
-                        from: 0
-                        to: 0
-                    }
-
-                    Rectangle {
-                        border.color: "gray"
-                        radius: 4
-                        height: progressBar.height
-                        width: textProcessedBytes.width
-
-                        Text {
-                            id: textProcessedBytes
-
-                            anchors.centerIn: parent
-                            horizontalAlignment: Text.AlignHCenter
-                            width: 400;
+                        color: "gray"
+                        enabled: false
+                        anchors {
+                            fill: parent
+                            leftMargin: root.margin
+                            rightMargin: root.margin
                         }
-                    }
-
-                    // обновляет диапазон значений ProgressBar'а
-                    function updateProgressRange(min, max)
-                    {
-                        progressBar.from = min
-                        progressBar.to = max
-                    }
-
-                    // обновляет текущее значение ProgressBar'а
-                    function updateProgressValue(value)
-                    {
-                        progressBar.value = value
-                        textProcessedBytes.text = `Обработано: ${value} / ${progressBar.to} байт`
+                        verticalAlignment: TextEdit.AlignVCenter
                     }
                 }
 
-                // выбор пути к файлу
-                RowLayout {
-                    id: rowFilePath
+                Button {
+                    id: buttonChooseFilePath
 
-                    Rectangle {
-                        border.color: "gray"
-                        radius: 4
-                        height: buttonChooseFilePath.height
-                        Layout.fillWidth: true
-
-                        TextEdit {
-                            id: editFilePath
-
-                            color: "gray"
-                            enabled: false
-                            anchors {
-                                fill: parent
-                                leftMargin: root.margin
-                                rightMargin: root.margin
-                            }
-                            verticalAlignment: TextEdit.AlignVCenter
-                        }
-                    }
-
-                    Button {
-                        id: buttonChooseFilePath
-
-                        enabled: (root.userAction === UserActionType.Canceled) || (root.userAction === UserActionType.Suspended)
-                        text: "..."
-                        onClicked: fileDialog.open()
-                    }
-
-                    FileDialog {
-                        id: fileDialog
-
-                        nameFilters: ["Text files (*.txt)"]
-                        folder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
-                        onAccepted: editFilePath.text = file
-                    }
+                    enabled: (root.userAction === UserActionType.Canceled) || (root.userAction === UserActionType.Suspended)
+                    text: "..."
+                    onClicked: fileDialog.open()
                 }
 
-                // кнопки управления процессом
-                RowLayout {
-                    id: rowControlButtons
+                FileDialog {
+                    id: fileDialog
 
-                    // кнопка "Начать"
-                    Button {
-                        id: buttonStart
+                    nameFilters: ["Text files (*.txt)"]
+                    folder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+                    onAccepted: editFilePath.text = file
+                }
+            }
 
-                        text: qsTr("Начать")
-                        enabled: (root.userAction === UserActionType.Canceled) && (editFilePath.text)
+            // кнопки управления процессом
+            RowLayout {
+                id: rowControlButtons
 
-                        onClicked: rowControlButtons.runParsingTask(editFilePath.text, root.maxWordCount)
-                    }
+                // кнопка "Начать"
+                Button {
+                    id: buttonStart
 
-                    // кнопка "Приостановить"
-                    Button {
-                        id: buttonSuspend
+                    text: qsTr("Начать")
+                    enabled: (root.userAction === UserActionType.Canceled) && (editFilePath.text)
 
-                        text: qsTr("Приостановить")
-                        enabled: (root.userAction === UserActionType.Started) || (root.userAction === UserActionType.Resumed)
+                    onClicked: rowControlButtons.runParsingTask(editFilePath.text, root.maxWordCount)
+                }
 
-                        onClicked: rowControlButtons.suspendParsingTask()
-                    }
+                // кнопка "Приостановить"
+                Button {
+                    id: buttonSuspend
 
-                    // кнопка "Продолжить"
-                    Button {
-                        id: buttonResume
+                    text: qsTr("Приостановить")
+                    enabled: (root.userAction === UserActionType.Started) || (root.userAction === UserActionType.Resumed)
 
-                        text: qsTr("Продолжить")
-                        enabled: (root.userAction === UserActionType.Suspended)
+                    onClicked: rowControlButtons.suspendParsingTask()
+                }
 
-                        onClicked: rowControlButtons.resumeParsingTask()
-                    }
+                // кнопка "Продолжить"
+                Button {
+                    id: buttonResume
 
-                    // кнопка "Завершить"
-                    Button {
-                        id: buttonStop
+                    text: qsTr("Продолжить")
+                    enabled: (root.userAction === UserActionType.Suspended)
 
-                        text: qsTr("Завершить")
-                        enabled: (root.userAction !== UserActionType.Canceled)
+                    onClicked: rowControlButtons.resumeParsingTask()
+                }
 
-                        onClicked: rowControlButtons.cancelParsingTask()
-                    }
+                // кнопка "Завершить"
+                Button {
+                    id: buttonStop
 
-                    function runParsingTask(filePath, maxWordCount)
-                    {
-                        ProjectController.runParsingTask(filePath, maxWordCount);
-                    }
+                    text: qsTr("Завершить")
+                    enabled: (root.userAction !== UserActionType.Canceled)
 
-                    function suspendParsingTask()
-                    {
-                        ProjectController.suspendParsingTask();
-                    }
+                    onClicked: rowControlButtons.cancelParsingTask()
+                }
 
-                    function resumeParsingTask()
-                    {
-                        ProjectController.resumeParsingTask();
-                    }
+                function runParsingTask(filePath, maxWordCount)
+                {
+                    ProjectController.runParsingTask(filePath, maxWordCount);
+                }
 
-                    function cancelParsingTask()
-                    {
-                        ProjectController.cancelParsingTask();
-                    }
+                function suspendParsingTask()
+                {
+                    ProjectController.suspendParsingTask();
+                }
+
+                function resumeParsingTask()
+                {
+                    ProjectController.resumeParsingTask();
+                }
+
+                function cancelParsingTask()
+                {
+                    ProjectController.cancelParsingTask();
                 }
             }
         }
