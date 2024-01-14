@@ -6,7 +6,7 @@ import QtCharts
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import Qt.labs.platform
-import OccurancyItem
+import Occurancy
 import UserActionType
 
 Window {
@@ -18,8 +18,9 @@ Window {
     readonly property int defaultAxisYMax: 1
     readonly property int maxWordCount: 15
     readonly property int margin: 10
+    readonly property int listWidth: 300
 
-    property var userAction: UserActionType.Canceled
+    property int userAction: UserActionType.Canceled
 
     visible: true
     width: pageWidth
@@ -30,16 +31,28 @@ Window {
 
         anchors.fill: parent
 
+        OccurancyList {
+            id: listItems
+
+            width: root.listWidth
+            margin: root.margin
+            anchors {
+                top: parent.top
+                right: parent.right
+                bottom: itemControls.top
+            }
+        }
+
         ChartView {
             id: chartView
 
             anchors {
                 top: parent.top
                 left: parent.left
-                right: parent.right
+                right: listItems.left
                 bottom: itemControls.top
             }
-            theme: ChartView.ChartThemeBlueIcy
+            theme: ChartView.ChartThemeQt
             antialiasing: true
             legend.visible: false
 
@@ -276,6 +289,7 @@ Window {
     function displayItems(items)
     {
         chartView.displayItems(items)
+        listItems.setItems(items)
     }
 
     // обновляет диапазон значений ProgressBar'а

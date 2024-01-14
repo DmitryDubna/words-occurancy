@@ -30,9 +30,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
     )
     qt_add_qml_module(words-occurancy
-        URI OccurancyItem
+        URI Occurancy
         VERSION 1.0
         QML_FILES
+            OccurancyList.qml
             main.qml
         SOURCES
             ${PROJECT_SOURCES}
