@@ -21,7 +21,13 @@ set(PROJECT_SOURCES
     user_action_type.h
     project_controller.h project_controller.cpp
     utils.h
-    qml.qrc
+    resources/qml.qrc
+)
+
+# необходимо для автодополнения QML
+set(QML2_IMPORT_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/qml
+    CACHE STRING "Qt Creator extra qml import paths"
+    FORCE
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -33,8 +39,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         URI Occurancy
         VERSION 1.0
         QML_FILES
-            OccurancyList.qml
-            main.qml
+            resources/main.qml
         SOURCES
             ${PROJECT_SOURCES}
     )

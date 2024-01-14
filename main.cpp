@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
 
     // движок QML
     QQmlApplicationEngine engine;
+    // регистрация пути к иерархии компонентов
+    engine.addImportPath("qrc:/qml");
     const QUrl url(QStringLiteral("qrc:/main.qml"));
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

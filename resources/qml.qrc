@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>qml/Components/Common/qmldir</file>
+        <file>qml/Components/Common/OccurancyList.qml</file>
+    </qresource>
+</RCC>

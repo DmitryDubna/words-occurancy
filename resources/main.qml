@@ -9,6 +9,8 @@ import Qt.labs.platform
 import Occurancy
 import UserActionType
 
+import Components.Common 1.0
+
 Window {
     id: root
 
