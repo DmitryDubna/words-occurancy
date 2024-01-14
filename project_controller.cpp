@@ -126,6 +126,8 @@ void ProjectController::initConnections()
             this, [this](){ emit userActionPerformed(UserActionType::Resumed); });
     connect(&m_watcher, &QFutureWatcherBase::canceled,
             this, [this](){ emit userActionPerformed(UserActionType::Canceled); });
+    connect(&m_watcher, &QFutureWatcherBase::finished,
+            this, [this](){ emit userActionPerformed(UserActionType::Canceled); });
 
 }
 

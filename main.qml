@@ -61,6 +61,30 @@ Window {
                     id: yValues
                 }
             }
+
+            // визуализирует список объектов OccurancyItem
+            function displayItems(items)
+            {
+                if (!items || !items.length)
+                    return
+
+                let words = []
+                let counts = []
+
+                items
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, root.maxWordCount)
+                    .sort((a, b) => a.word.localeCompare(b.word))
+                    .forEach(item => {
+                                 words.push(item.word)
+                                 counts.push(item.count)
+                             });
+
+                wordsAxis.categories = words
+                yValues.values = counts
+
+                countsAxis.max = Math.max(...counts)
+            }
         }
 
         Item {
@@ -97,7 +121,7 @@ Window {
 
                         Layout.fillWidth: true
                         from: 0
-                        to: 100
+                        to: 0
                     }
 
                     Rectangle {
@@ -115,6 +139,14 @@ Window {
                         }
                     }
 
+                    // обновляет диапазон значений ProgressBar'а
+                    function updateProgressRange(min, max)
+                    {
+                        progressBar.from = min
+                        progressBar.to = max
+                    }
+
+                    // обновляет текущее значение ProgressBar'а
                     function updateProgressValue(value)
                     {
                         progressBar.value = value
@@ -149,6 +181,7 @@ Window {
                     Button {
                         id: buttonChooseFilePath
 
+                        enabled: (root.userAction === UserActionType.Canceled) || (root.userAction === UserActionType.Suspended)
                         text: "..."
                         onClicked: fileDialog.open()
                     }
@@ -235,39 +268,20 @@ Window {
     {
         ProjectController.progressRangeChanged.connect(updateProgressRange)
         ProjectController.progressValueChanged.connect(updateProgressValue)
-        ProjectController.itemsExtracted.connect(setItems)
+        ProjectController.itemsExtracted.connect(displayItems)
         ProjectController.userActionPerformed.connect(setUserAction)
     }
 
     // задает список объектов OccurancyItem
-    function setItems(items)
+    function displayItems(items)
     {
-        if (!items || !items.length)
-            return
-
-        let words = []
-        let counts = []
-
-        items
-            .sort((a, b) => b.count - a.count)
-            .slice(0, root.maxWordCount)
-            .sort((a, b) => a.word.localeCompare(b.word))
-            .forEach(item => {
-                         words.push(item.word)
-                         counts.push(item.count)
-                     });
-
-        wordsAxis.categories = words
-        yValues.values = counts
-
-        countsAxis.max = Math.max(...counts)
+        chartView.displayItems(items)
     }
 
     // обновляет диапазон значений ProgressBar'а
     function updateProgressRange(min, max)
     {
-        progressBar.from = min
-        progressBar.to = max
+        rowProgress.updateProgressRange(min, max)
     }
 
     // обновляет текущее значение ProgressBar'а
