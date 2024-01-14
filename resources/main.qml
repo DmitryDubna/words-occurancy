@@ -13,10 +13,10 @@ Window {
 
     readonly property int defaultWidth: 1920
     readonly property int defaultHeight: 1080
-    readonly property int maxWordCount: 15
     readonly property int margin: 10
     readonly property string selectedFile: panelFileChoose.filePath
 
+    property int maxWordCount: 15
     property int userAction: UserActionType.Canceled
 
     width: defaultWidth
@@ -97,6 +97,7 @@ Window {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
+            maxWordCount: root.maxWordCount
         }
 
         // панель органов управления

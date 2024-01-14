@@ -39,7 +39,8 @@ RowLayout {
         id: buttonChooseFilePath
 
         enabled: root.buttonEnabled
-        text: "..."
+        icon.source: "qrc:/images/folder.png"
+
         onClicked: fileDialog.open()
     }
 

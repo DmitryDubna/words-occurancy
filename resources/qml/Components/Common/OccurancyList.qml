@@ -6,7 +6,7 @@ Rectangle {
     readonly property string wordRole: "word"
     readonly property string countRole: "count"
 
-    property int maxItemCount: 15
+    property int maxItemCount: 30
     property int itemPadding: 20
     property int itemHeight: 30
     property int itemFontSize: 14

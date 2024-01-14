@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+
 /// Парсит строку, выделяя из нее слова на базе регулярного выражения.
 /// Возвращает коллекцию выделенных слов.
 inline std::vector<std::string> extractWords(const std::string line, const std::regex regex)

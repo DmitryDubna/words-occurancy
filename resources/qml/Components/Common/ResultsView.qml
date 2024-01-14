@@ -12,6 +12,7 @@ RowLayout {
     readonly property int listWidth: 300
     readonly property int margin: 10
 
+    property int maxWordCount: 15
     property string borderColor: "gray"
 
     function updateHistogram(items)
@@ -96,6 +97,7 @@ RowLayout {
     OccurancyList {
         id: listItems
 
+        maxItemCount: root.maxWordCount
         width: root.listWidth
         borderColor: root.borderColor
         Layout.fillHeight: true

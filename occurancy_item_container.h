@@ -5,6 +5,7 @@
 #include "occurancy_item.h"
 
 
+/// Контейнер для хранения и модификации найденных слов и количества их вхождений.
 class OccurancyItemContainer
 {
 public:

@@ -10,9 +10,6 @@
 #include "utils.h"
 #include "occurancy_item_container.h"
 
-// FIXME: убрать после отладки
-#include <QDebug>
-
 
 namespace
 {

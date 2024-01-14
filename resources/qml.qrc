@@ -7,5 +7,6 @@
         <file>qml/Components/Common/ProgressPanel.qml</file>
         <file>qml/Components/Common/FileChoosePanel.qml</file>
         <file>qml/Components/Common/ControlButtonPanel.qml</file>
+        <file>images/folder.png</file>
     </qresource>
 </RCC>

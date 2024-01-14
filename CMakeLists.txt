@@ -18,8 +18,8 @@ set(PROJECT_SOURCES
     main.cpp
     occurancy_item.h
     occurancy_item_container.h occurancy_item_container.cpp
-    user_action_type.h
     project_controller.h project_controller.cpp
+    user_action_type.h
     utils.h
     resources/qml.qrc
 )
