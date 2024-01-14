@@ -10,6 +10,28 @@ RowLayout {
     layoutDirection: Qt.LeftToRight
     spacing: 10
 
+    // обновляет диапазон значений ProgressBar'а
+    function updateProgressRange(min, max)
+    {
+        progressBar.from = min
+        progressBar.to = max
+    }
+
+    // обновляет текущее значение ProgressBar'а
+    function updateProgressValue(value)
+    {
+        progressBar.value = value
+        textProcessedBytes.text = `Обработано: ${value} / ${progressBar.to} байт`
+    }
+
+    // сбрасывает значение ProgressBar'а в исходное
+    function resetProgressValue()
+    {
+        const value = progressBar.from
+        progressBar.value = value
+        textProcessedBytes.text = `Обработано: ${value} / ${progressBar.to} байт`
+    }
+
     ProgressBar {
         id: progressBar
 
@@ -31,27 +53,5 @@ RowLayout {
             horizontalAlignment: Text.AlignHCenter
             width: 400;
         }
-    }
-
-    // обновляет диапазон значений ProgressBar'а
-    function updateProgressRange(min, max)
-    {
-        progressBar.from = min
-        progressBar.to = max
-    }
-
-    // обновляет текущее значение ProgressBar'а
-    function updateProgressValue(value)
-    {
-        progressBar.value = value
-        textProcessedBytes.text = `Обработано: ${value} / ${progressBar.to} байт`
-    }
-
-    // сбрасывает значение ProgressBar'а в исходное
-    function resetProgressValue()
-    {
-        const value = progressBar.from
-        progressBar.value = value
-        textProcessedBytes.text = `Обработано: ${value} / ${progressBar.to} байт`
     }
 }

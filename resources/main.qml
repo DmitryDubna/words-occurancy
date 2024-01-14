@@ -15,54 +15,13 @@ Window {
     readonly property int defaultHeight: 1080
     readonly property int maxWordCount: 15
     readonly property int margin: 10
-    readonly property var selectedFile: panelFileChoose.filePath
+    readonly property string selectedFile: panelFileChoose.filePath
 
     property int userAction: UserActionType.Canceled
 
     width: defaultWidth
     height: defaultHeight
     visible: true
-
-    ColumnLayout {
-        id: itemContent
-
-        anchors.fill: parent
-
-        // панель визуального представления результатов
-        ResultsView {
-            id: resultsView
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-        }
-
-        // панель органов управления
-        ColumnLayout {
-            id: columnControls
-
-            Layout.margins: root.margin
-
-            // прогрессбар + лейбл загрузки
-            ProgressPanel {
-                id: panelProgress
-            }
-
-            // выбор пути к файлу
-            FileChoosePanel {
-                id: panelFileChoose
-
-                buttonEnabled: (root.userAction === UserActionType.Canceled) || (root.userAction === UserActionType.Suspended)
-            }
-
-            // кнопки управления процессом
-            ControlButtonPanel {
-                id: panelControlButtons
-
-                userAction: root.userAction
-                fileSelected: root.selectedFile
-            }
-        }
-    }
 
     // инициализирует обработчики сигналов
     function initConnections()
@@ -125,6 +84,47 @@ Window {
     function cancelParsingTask()
     {
         ProjectController.cancelParsingTask();
+    }
+
+    ColumnLayout {
+        id: itemContent
+
+        anchors.fill: parent
+
+        // панель визуального представления результатов
+        ResultsView {
+            id: resultsView
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+
+        // панель органов управления
+        ColumnLayout {
+            id: columnControls
+
+            Layout.margins: root.margin
+
+            // прогрессбар + лейбл загрузки
+            ProgressPanel {
+                id: panelProgress
+            }
+
+            // выбор пути к файлу
+            FileChoosePanel {
+                id: panelFileChoose
+
+                buttonEnabled: (root.userAction === UserActionType.Canceled) || (root.userAction === UserActionType.Suspended)
+            }
+
+            // кнопки управления процессом
+            ControlButtonPanel {
+                id: panelControlButtons
+
+                userAction: root.userAction
+                fileSelected: root.selectedFile
+            }
+        }
     }
 
     Component.onCompleted: {

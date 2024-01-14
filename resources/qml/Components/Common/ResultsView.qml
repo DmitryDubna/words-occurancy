@@ -12,6 +12,22 @@ RowLayout {
     readonly property int listWidth: 300
     readonly property int margin: 10
 
+    function updateHistogram(items)
+    {
+        chartView.displayItems(items)
+    }
+
+    function updateList(items)
+    {
+        listItems.setItems(items)
+    }
+
+    function update(items)
+    {
+        updateHistogram(items)
+        updateList(items)
+    }
+
     ChartView {
         id: chartView
 
@@ -71,21 +87,5 @@ RowLayout {
         width: root.listWidth
         Layout.fillHeight: true
         Layout.margins: root.margin
-    }
-
-    function updateHistogram(items)
-    {
-        chartView.displayItems(items)
-    }
-
-    function updateList(items)
-    {
-        listItems.setItems(items)
-    }
-
-    function update(items)
-    {
-        updateHistogram(items)
-        updateList(items)
     }
 }
