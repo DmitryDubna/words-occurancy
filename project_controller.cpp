@@ -18,6 +18,7 @@ namespace
 {
 
 constexpr const char* SPLIT_WORD_REGEX{ R"([,.:;?!<>|`~@#$%^&"\s\\\/\+\-\=\\*[\]\{\}\(\)]+)" };
+constexpr std::size_t UPDATE_COUNT{ 100 };
 
 /// Выделяет из строки слова с помощью регулярного выражения.
 void parseLine(const std::string& line, OccurancyItemContainer& container)
@@ -49,6 +50,10 @@ void parseFile(QPromise<QList<OccurancyItem>>& promise,
     const auto totalBytes = std::filesystem::file_size(filePath);
     promise.setProgressRange(0, totalBytes);
 
+    // NOTE: в целях оптимизации обновление разбито на UPDATE_COUNT шагов
+    const std::uintmax_t bytesStep = totalBytes / UPDATE_COUNT;
+    std::uintmax_t nextStep = bytesStep;
+
     // текущее значение ProgressBar'а = текущая позиция в файле
     std::uintmax_t bytesRead{ 0 };
     while (file)
@@ -67,12 +72,18 @@ void parseFile(QPromise<QList<OccurancyItem>>& promise,
         if ((bytesRead = file.tellg()) == -1)
             break;
 
+        // обновляем, если достигли следующего шага или конца файла
+        if ((bytesRead < nextStep) && (bytesRead != totalBytes))
+            continue;
+
         // обновляем позицию ProgressBar'а
         promise.setProgressValue(bytesRead);
 
         // забираем отсортированный список результатов
         auto sortedList = container.toSortedList(Qt::DescendingOrder, wordsLimit);
         promise.addResult(std::move(sortedList));
+
+        nextStep += bytesStep;
     }
 }
 

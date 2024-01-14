@@ -47,42 +47,5 @@ Rectangle {
         Text {
             text: `${modelData[wordRole]} : ${modelData[countRole]}`
         }
-
-//        Rectangle {
-//            id: rectDelegate
-
-//            anchors {
-//                left: parent.left
-//                right: parent.right
-//                leftMargin: rectDelegate.itemPadding
-//                rightMargin: rectDelegate.itemPadding
-//                topMargin: rectDelegate.itemPadding
-//                bottomMargin: rectDelegate.itemPadding
-//            }
-//            radius: 4
-
-//            Text {
-//                id: textWord
-
-//                width: parent.width / 2
-//                anchors {
-//                    left: parent.left
-//                    top: parent.top
-//                    bottom: parent.bottom
-//                }
-//                text: modelData[wordRole]
-//            }
-//            Text {
-//                id: textCount
-
-//                anchors {
-//                    left: textWord.right
-//                    right: parent.right
-//                    top: parent.top
-//                    bottom: parent.bottom
-//                }
-//                text: modelData[countRole]
-//            }
-//        }
     }
 }
