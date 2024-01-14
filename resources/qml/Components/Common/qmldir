@@ -1,4 +1,6 @@
 module Common
 OccurancyList 1.0 OccurancyList.qml
 ResultsView 1.0 ResultsView.qml
-
+ProgressPanel 1.0 ProgressPanel.qml
+FileChoosePanel 1.0 FileChoosePanel.qml
+ControlButtonPanel 1.0 ControlButtonPanel.qml

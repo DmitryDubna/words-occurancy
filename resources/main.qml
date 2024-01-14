@@ -1,10 +1,8 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
-import QtQml
 import QtQuick.Layouts
-import QtQuick.Dialogs
-import Qt.labs.platform
+import QtQml
 import Occurancy
 import UserActionType
 
@@ -17,6 +15,7 @@ Window {
     readonly property int pageHeight: 1080
     readonly property int maxWordCount: 15
     readonly property int margin: 10
+    readonly property var selectedFile: panelFileChoose.filePath
 
     property int userAction: UserActionType.Canceled
 
@@ -44,153 +43,23 @@ Window {
             Layout.margins: root.margin
 
             // прогрессбар + лейбл загрузки
-            RowLayout {
-                id: rowProgress
-                layoutDirection: Qt.LeftToRight
-                spacing: 10
-
-                ProgressBar {
-                    id: progressBar
-
-                    Layout.fillWidth: true
-                    from: 0
-                    to: 0
-                }
-
-                Rectangle {
-                    border.color: "gray"
-                    radius: 4
-                    height: progressBar.height
-                    width: textProcessedBytes.width
-
-                    Text {
-                        id: textProcessedBytes
-
-                        anchors.centerIn: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        width: 400;
-                    }
-                }
-
-                // обновляет диапазон значений ProgressBar'а
-                function updateProgressRange(min, max)
-                {
-                    progressBar.from = min
-                    progressBar.to = max
-                }
-
-                // обновляет текущее значение ProgressBar'а
-                function updateProgressValue(value)
-                {
-                    progressBar.value = value
-                    textProcessedBytes.text = `Обработано: ${value} / ${progressBar.to} байт`
-                }
+            ProgressPanel {
+                id: panelProgress
             }
 
             // выбор пути к файлу
-            RowLayout {
-                id: rowFilePath
+            FileChoosePanel {
+                id: panelFileChoose
 
-                Rectangle {
-                    border.color: "gray"
-                    radius: 4
-                    height: buttonChooseFilePath.height
-                    Layout.fillWidth: true
-
-                    TextEdit {
-                        id: editFilePath
-
-                        color: "gray"
-                        enabled: false
-                        anchors {
-                            fill: parent
-                            leftMargin: root.margin
-                            rightMargin: root.margin
-                        }
-                        verticalAlignment: TextEdit.AlignVCenter
-                    }
-                }
-
-                Button {
-                    id: buttonChooseFilePath
-
-                    enabled: (root.userAction === UserActionType.Canceled) || (root.userAction === UserActionType.Suspended)
-                    text: "..."
-                    onClicked: fileDialog.open()
-                }
-
-                FileDialog {
-                    id: fileDialog
-
-                    nameFilters: ["Text files (*.txt)"]
-                    folder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
-                    onAccepted: editFilePath.text = file
-                }
+                buttonEnabled: (root.userAction === UserActionType.Canceled) || (root.userAction === UserActionType.Suspended)
             }
 
             // кнопки управления процессом
-            RowLayout {
-                id: rowControlButtons
+            ControlButtonPanel {
+                id: panelControlButtons
 
-                // кнопка "Начать"
-                Button {
-                    id: buttonStart
-
-                    text: qsTr("Начать")
-                    enabled: (root.userAction === UserActionType.Canceled) && (editFilePath.text)
-
-                    onClicked: rowControlButtons.runParsingTask(editFilePath.text, root.maxWordCount)
-                }
-
-                // кнопка "Приостановить"
-                Button {
-                    id: buttonSuspend
-
-                    text: qsTr("Приостановить")
-                    enabled: (root.userAction === UserActionType.Started) || (root.userAction === UserActionType.Resumed)
-
-                    onClicked: rowControlButtons.suspendParsingTask()
-                }
-
-                // кнопка "Продолжить"
-                Button {
-                    id: buttonResume
-
-                    text: qsTr("Продолжить")
-                    enabled: (root.userAction === UserActionType.Suspended)
-
-                    onClicked: rowControlButtons.resumeParsingTask()
-                }
-
-                // кнопка "Завершить"
-                Button {
-                    id: buttonStop
-
-                    text: qsTr("Завершить")
-                    enabled: (root.userAction !== UserActionType.Canceled)
-
-                    onClicked: rowControlButtons.cancelParsingTask()
-                }
-
-                function runParsingTask(filePath, maxWordCount)
-                {
-                    ProjectController.runParsingTask(filePath, maxWordCount);
-                }
-
-                function suspendParsingTask()
-                {
-                    ProjectController.suspendParsingTask();
-                }
-
-                function resumeParsingTask()
-                {
-                    ProjectController.resumeParsingTask();
-                }
-
-                function cancelParsingTask()
-                {
-                    ProjectController.cancelParsingTask();
-                }
+                userAction: root.userAction
+                fileSelected: root.selectedFile
             }
         }
     }
@@ -202,6 +71,10 @@ Window {
         ProjectController.progressValueChanged.connect(updateProgressValue)
         ProjectController.itemsExtracted.connect(displayItems)
         ProjectController.userActionPerformed.connect(setUserAction)
+        panelControlButtons.buttonStartClicked.connect(runParsingTask)
+        panelControlButtons.buttonSuspendClicked.connect(suspendParsingTask)
+        panelControlButtons.buttonResumeClicked.connect(resumeParsingTask)
+        panelControlButtons.buttonCancelClicked.connect(cancelParsingTask)
     }
 
     // обновляет визуальное отображение результатов
@@ -213,13 +86,19 @@ Window {
     // обновляет диапазон значений ProgressBar'а
     function updateProgressRange(min, max)
     {
-        rowProgress.updateProgressRange(min, max)
+        panelProgress.updateProgressRange(min, max)
     }
 
     // обновляет текущее значение ProgressBar'а
     function updateProgressValue(value)
     {
-        rowProgress.updateProgressValue(value)
+        panelProgress.updateProgressValue(value)
+    }
+
+    // обновляет текущее значение ProgressBar'а
+    function resetProgressValue(value)
+    {
+        panelProgress.resetProgressValue()
     }
 
     // устанавливает текущее действие пользователя
@@ -228,8 +107,28 @@ Window {
         root.userAction = action
     }
 
+    function runParsingTask()
+    {
+        ProjectController.runParsingTask(root.selectedFile, root.maxWordCount);
+    }
+
+    function suspendParsingTask()
+    {
+        ProjectController.suspendParsingTask();
+    }
+
+    function resumeParsingTask()
+    {
+        ProjectController.resumeParsingTask();
+    }
+
+    function cancelParsingTask()
+    {
+        ProjectController.cancelParsingTask();
+    }
+
     Component.onCompleted: {
         root.initConnections()
-        rowProgress.updateProgressValue(0)
+        root.resetProgressValue()
     }
 }

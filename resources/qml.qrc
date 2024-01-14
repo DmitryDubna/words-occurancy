@@ -4,5 +4,8 @@
         <file>qml/Components/Common/qmldir</file>
         <file>qml/Components/Common/OccurancyList.qml</file>
         <file>qml/Components/Common/ResultsView.qml</file>
+        <file>qml/Components/Common/ProgressPanel.qml</file>
+        <file>qml/Components/Common/FileChoosePanel.qml</file>
+        <file>qml/Components/Common/ControlButtonPanel.qml</file>
     </qresource>
 </RCC>
