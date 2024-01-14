@@ -2,25 +2,21 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 import QtQml
-import QtCharts
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import Qt.labs.platform
 import Occurancy
 import UserActionType
 
-import Components.Common 1.0
+import Components.Common
 
 Window {
     id: root
 
     readonly property int pageWidth: 1920
     readonly property int pageHeight: 1080
-    readonly property int defaultAxisYMin: 0
-    readonly property int defaultAxisYMax: 1
     readonly property int maxWordCount: 15
     readonly property int margin: 10
-    readonly property int listWidth: 300
 
     property int userAction: UserActionType.Canceled
 
@@ -34,69 +30,11 @@ Window {
         anchors.fill: parent
 
         // панель визуального представления результатов
-        RowLayout {
-            id: rowResultView
+        ResultsView {
+            id: resultsView
 
-            ChartView {
-                id: chartView
-
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                theme: ChartView.ChartThemeQt
-                antialiasing: true
-                legend.visible: false
-
-                BarSeries {
-                    id: series
-
-                    barWidth: 1
-                    axisX: BarCategoryAxis {
-                        id: wordsAxis
-                    }
-                    axisY: ValueAxis {
-                        id: countsAxis
-
-                        min: defaultAxisYMin
-                        max: defaultAxisYMax
-                    }
-
-                    BarSet {
-                        id: yValues
-                    }
-                }
-
-                // визуализирует список объектов OccurancyItem
-                function displayItems(items)
-                {
-                    if (!items || !items.length)
-                        return
-
-                    let words = []
-                    let counts = []
-
-                    items
-                    .sort((a, b) => b.count - a.count)
-                    .slice(0, root.maxWordCount)
-                    .sort((a, b) => a.word.localeCompare(b.word))
-                    .forEach(item => {
-                                 words.push(item.word)
-                                 counts.push(item.count)
-                             });
-
-                    wordsAxis.categories = words
-                    yValues.values = counts
-
-                    countsAxis.max = Math.max(...counts)
-                }
-            }
-
-            OccurancyList {
-                id: listItems
-
-                width: root.listWidth
-                Layout.fillHeight: true
-                Layout.margins: root.margin
-            }
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
 
         // панель органов управления
@@ -185,7 +123,7 @@ Window {
                     id: fileDialog
 
                     nameFilters: ["Text files (*.txt)"]
-                    folder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+                    folder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
                     onAccepted: editFilePath.text = file
                 }
             }
@@ -266,11 +204,10 @@ Window {
         ProjectController.userActionPerformed.connect(setUserAction)
     }
 
-    // задает список объектов OccurancyItem
+    // обновляет визуальное отображение результатов
     function displayItems(items)
     {
-        chartView.displayItems(items)
-        listItems.setItems(items)
+        resultsView.update(items)
     }
 
     // обновляет диапазон значений ProgressBar'а

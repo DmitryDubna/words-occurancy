@@ -1,3 +1,4 @@
 module Common
 OccurancyList 1.0 OccurancyList.qml
+ResultsView 1.0 ResultsView.qml
 
